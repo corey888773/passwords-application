@@ -21,6 +21,8 @@ set(PROJECT_SOURCES
         mainwindow.cpp
         mainwindow.h
         mainwindow.ui
+        databasemanager.cpp
+        databasemanager.h
         ${TS_FILES}
 )
 

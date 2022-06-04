@@ -5,6 +5,7 @@
 #include "databasemanager.h"
 #include <cstring>
 #include <string>
+#include <algorithm>
 
 DataBaseManager::DataBaseManager(struct connection_details *c_details)  : connection_details(c_details) {
     connection = connection_setup();
@@ -117,7 +118,7 @@ void DataBaseManager::sites_to_vector(){
     select_all();
     MYSQL_ROW row;
     while((row = mysql_fetch_row(result)) != nullptr) {
-        if (!std::count(sites_names.begin(), sites_names.end(), row[1])) {
+        if (std::find(sites_names.begin(), sites_names.end(), row[1]) == sites_names.end()) {
             char *temp = new char[strlen(row[1])];
             strcpy(temp, row[1]);
 
@@ -153,7 +154,5 @@ user_data &DataBaseManager::gather_info(const char *site_name) {
 
     return *res;
 }
-
-
 
 

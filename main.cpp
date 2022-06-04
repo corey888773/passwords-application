@@ -4,6 +4,7 @@
 #include <QLocale>
 #include <QTranslator>
 #include "databasemanager.h"
+#include <iostream>
 
 int main(int argc, char *argv[])
 {
@@ -32,11 +33,12 @@ int main(int argc, char *argv[])
     userData->username = "test3";
     userData->passowrd = "Password3";
 
-    DataBaseManager *dataBase = new DataBaseManager(mysqlD);
+    auto *data = new DataBaseManager(mysqlD);
+    data->select_all();
+    data->showResult();
 
-
+    delete data;
     delete mysqlD;
-    delete dataBase;
     delete userData;
 
 

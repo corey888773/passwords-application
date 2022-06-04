@@ -3,13 +3,13 @@
 
 #include <memory>
 #include <mysql.h>
-
+#include <vector>
 
 struct connection_details{
     const char *server, *user, *password, *database;
 };
 struct user_data{
-    const char *site_name, *email, *username, *passowrd;
+    char *site_name, *email, *username, *passowrd;
 };
 
 class DataBaseManager {
@@ -21,7 +21,7 @@ private:
     static char* add_quote(const char* text);
 
 public:
-    explicit DataBaseManager(struct connection_details *c_details);
+    DataBaseManager(struct connection_details *c_details);
     ~DataBaseManager();
     MYSQL *connection_setup();
     MYSQL_RES *execute_query(const char *sql_query);
