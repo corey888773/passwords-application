@@ -34,12 +34,17 @@ MYSQL_RES *DataBaseManager::execute_query(const char *sql_query) {
 }
 
 void DataBaseManager::select_row(char *id) {
+    std::vector<char *> memory_to_clear;
+
     id = add_quote(id);
-    const char* base = "select * from login_data where id = ";
+    const char* base = "select * from login_data where id =";
     char* temp = new char[strlen(base) + strlen(id)];
-    strcpy(temp, base);
-    strcpy(temp + strlen(base), id);
+    strncpy(temp, base, strlen(base));
+    strncpy(temp + strlen(base), id,strlen(id));
     result = this->execute_query(temp);
+
+    memory_to_clear.push_back(temp);
+    dump(memory_to_clear);
 }
 
 void DataBaseManager::showResult() {
@@ -57,15 +62,17 @@ DataBaseManager::~DataBaseManager() {
 char *DataBaseManager::add_quote(const char *text) {
     char* temp = new char[strlen(text)+2];
     auto quote = "\'";
-    strcpy(temp, quote);
-    strcpy(temp+1, text);
-    strcpy(temp + strlen(text) + 1,quote);
+    strncpy(temp, quote, 1);
+    strncpy(temp+1, text, strlen(text));
+    strncpy(temp + strlen(text) + 1,quote, 1);
 
     return temp;
+
 
 }
 
 void DataBaseManager::new_data(struct user_data *userData) {
+    std::vector<char*> memory_to_clear;
 
     auto site_name = add_quote(userData->site_name);
     auto email = add_quote(userData->email);
@@ -73,39 +80,52 @@ void DataBaseManager::new_data(struct user_data *userData) {
     auto password = add_quote(userData->passowrd);
     auto base = "INSERT INTO login_data (site_name, email, user_name, user_password) VALUES (";
 
-    auto i = 0;
-    char *query = new char[strlen(site_name) + strlen(email) + strlen(username) + strlen(password) + strlen(base) + 3];
-    strcpy(query + i, base);
+    memory_to_clear.push_back(site_name);
+    memory_to_clear.push_back(email);
+    memory_to_clear.push_back(username);
+    memory_to_clear.push_back(password);
+
+    size_t i = 0;
+    char *query = new char[strlen(site_name) + strlen(email) + strlen(username) + strlen(password) + strlen(base) + 4];
+    strncpy(query + i, base, strlen(base));
     i += strlen(base);
-    strcpy(query + i, site_name);
+    strncpy(query + i, site_name, strlen(site_name));
     i += strlen(site_name);
-    strcpy(query + i, ",");
+    strncpy(query + i, ",",1);
     i += 1;
-    strcpy(query + i, email);
+    strncpy(query + i, email, strlen(email));
     i += strlen(email);
-    strcpy(query + i, ",");
+    strncpy(query + i, ",",1);
     i += 1;
-    strcpy(query + i, username);
+    strncpy(query + i, username, strlen(username));
     i += strlen(username);
-    strcpy(query + i, ",");
+    strncpy(query + i, ",",1);
     i += 1;
-    strcpy(query + i, password);
+    strncpy(query + i, password, strlen(password));
     i += strlen(password);
-    strcpy(query + i, ")");
+    strncpy(query + i, ")", 1);
 
     result = execute_query(query);
     sites_to_vector();
+    dump(memory_to_clear);
 }
 
 void DataBaseManager::delete_data(char *id) {
+    std::vector<char *> memory_to_clear;
+
     id = add_quote(id);
-    const char* base = "delete from login_data where id = ";
+    const char* base = "delete from login_data where id =";
     char* temp = new char[strlen(base) + strlen(id)];
-    strcpy(temp, base);
+    strncpy(temp, base, strlen(base));
     strcpy(temp + strlen(base), id);
+
+    memory_to_clear.push_back(temp);
+    memory_to_clear.push_back(id);
+
 
     result = this->execute_query(temp);
     sites_to_vector();
+    dump(memory_to_clear);
 }
 
 void DataBaseManager::select_all() {
@@ -136,13 +156,17 @@ void DataBaseManager::show_sites() {
 }
 
 user_data &DataBaseManager::gather_info(const char *site_name) {
+    std::vector<char *> memory_to_clear;
+
     auto *res = new user_data;
 
     site_name = add_quote(site_name);
-    const char* base = "select * from login_data where site_name = ";
+    const char* base = "select * from login_data where site_name =";
     char* temp = new char[strlen(base) + strlen(site_name)];
-    strcpy(temp, base);
+    strncpy(temp, base, strlen(base));
     strcpy(temp + strlen(base), site_name);
+    memory_to_clear.push_back(temp);
+
     result = this->execute_query(temp);
 
     auto row = mysql_fetch_row(result);
@@ -152,7 +176,18 @@ user_data &DataBaseManager::gather_info(const char *site_name) {
     res->username = row[3];
     res->passowrd = row[4];
 
+
+    dump(memory_to_clear);
+
     return *res;
+
+
 }
+
+
+void DataBaseManager::dump(std::vector<char *> mem) {
+    mem.clear();
+}
+
 
 

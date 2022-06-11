@@ -33,7 +33,7 @@ public:
     void sites_to_vector();
     void show_sites();
     user_data &gather_info(const char* site_name);
-
+    void dump(std::vector<char*> mem);
 };
 
 #endif // DATABASEMANAGER_H
