@@ -77,7 +77,7 @@ void DataBaseManager::new_data(struct user_data *userData) {
     auto site_name = add_quote(userData->site_name);
     auto email = add_quote(userData->email);
     auto username = add_quote(userData->username);
-    auto password = add_quote(userData->passowrd);
+    auto password = add_quote(userData->password);
     auto base = "INSERT INTO login_data (site_name, email, user_name, user_password) VALUES (";
 
     memory_to_clear.push_back(site_name);
@@ -103,29 +103,57 @@ void DataBaseManager::new_data(struct user_data *userData) {
     i += 1;
     strncpy(query + i, password, strlen(password));
     i += strlen(password);
-    strncpy(query + i, ")", 1);
+    strcpy(query + i, ")");
 
     result = execute_query(query);
     sites_to_vector();
     dump(memory_to_clear);
 }
 
-void DataBaseManager::delete_data(char *id) {
+//void DataBaseManager::delete_data(char *id) {
+//    std::vector<char *> memory_to_clear;
+
+//    id = add_quote(id);
+//    const char* base = "delete from login_data where id =";
+//    char* temp = new char[strlen(base) + strlen(id)];
+//    strncpy(temp, base, strlen(base));
+//    strcpy(temp + strlen(base), id);
+
+//    memory_to_clear.push_back(temp);
+//    memory_to_clear.push_back(id);
+
+
+//    result = this->execute_query(temp);
+//    sites_to_vector();
+//    dump(memory_to_clear);
+//}
+
+void DataBaseManager::delete_data(const char* site_name, const char* user_name){
     std::vector<char *> memory_to_clear;
 
-    id = add_quote(id);
-    const char* base = "delete from login_data where id =";
-    char* temp = new char[strlen(base) + strlen(id)];
-    strncpy(temp, base, strlen(base));
-    strcpy(temp + strlen(base), id);
+    user_name = add_quote(user_name);
+    site_name = add_quote(site_name);
+    const char* base = "delete from login_data where site_name=";
+    const char* base2 = " and user_name =";
+    char* temp = new char[strlen(base) + strlen(site_name) + strlen(base2) + strlen(user_name)];
+
+    size_t i = 0;
+    strncpy(temp + i, base, strlen(base));
+    i += strlen(base);
+    strncpy(temp + i, site_name, strlen(site_name));
+    i += strlen(site_name);
+    strncpy(temp + i, base2, strlen(base2));
+    i += strlen(base2);
+    strcpy(temp + i, user_name);
 
     memory_to_clear.push_back(temp);
-    memory_to_clear.push_back(id);
 
+    sites_names.erase(std::remove(sites_names.begin(), sites_names.end(), site_name), sites_names.end());
 
+    delete []site_name;
+    delete []user_name;
     result = this->execute_query(temp);
-    sites_to_vector();
-    dump(memory_to_clear);
+
 }
 
 void DataBaseManager::select_all() {
@@ -174,10 +202,11 @@ user_data &DataBaseManager::gather_info(const char *site_name) {
     res->site_name = row[1];
     res->email = row[2];
     res->username = row[3];
-    res->passowrd = row[4];
+    res->password = row[4];
 
 
     dump(memory_to_clear);
+//    delete site_name;
 
     return *res;
 
