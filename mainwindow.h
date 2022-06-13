@@ -28,7 +28,7 @@ private:
     Ui::MainWindow *ui;
     char *to_charPtr(QString text);
     void reset_list();
-    user_data *get_user();
+    void get_user();
 
 private slots:
     void set_current_data();

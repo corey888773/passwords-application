@@ -68,7 +68,7 @@ void MainWindow::change_data(){
     auto currIndex = ui->sitesList->currentIndex();
     switch(dataChange){
     case 1:
-        data->change_data(get_user());
+        data->change_data(userData);
 
         ui->username->setReadOnly(true);
         ui->emailAddress->setReadOnly(true);
@@ -98,13 +98,23 @@ void MainWindow::delete_user(){
     ui->sitesList->setCurrentIndex(0);
 }
 void MainWindow::add_user(){
+
+//    delete userData;
+//    userData = new user_data;
+//    userData->site_name = to_charPtr(ui->NewSitename->text());
+//    userData->email = to_charPtr(ui->NewEmailAddress->text());
+//    userData->username = to_charPtr(ui->NewUsername->text());
+//    userData->password = pass->encode(ui->NewPassword->text());
+
+    get_user();
+
     std::cout<< userData->site_name << std::endl;
     std::cout<< userData->email << std::endl;
     std::cout<< userData->username << std::endl;
     std::cout<< userData->password << std::endl;
 
 
-    data->new_data(get_user());
+    data->new_data(userData);
     reset_list();
 }
 
@@ -124,15 +134,13 @@ void MainWindow::lock_password(){
     }
 }
 
-user_data *MainWindow::get_user(){
-    delete userData;
-    userData = new user_data;
+void MainWindow::get_user(){
+    delete this->userData;
+    this->userData = new user_data;
     userData->site_name = to_charPtr(ui->NewSitename->text());
     userData->email = to_charPtr(ui->NewEmailAddress->text());
     userData->username = to_charPtr(ui->NewUsername->text());
     userData->password = pass->encode(ui->NewPassword->text());
-
-    return userData;
 }
 
 MainWindow::~MainWindow()
