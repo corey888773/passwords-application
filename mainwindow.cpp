@@ -15,15 +15,12 @@ MainWindow::MainWindow(QWidget *parent)
     mysqlD->database = "Passwords";
 
     userData = new user_data;
-    userData->site_name = "test3";
-    userData->email = "test3@mail.com";
-    userData->username = "test3";
-    userData->password = "Password3";
-
-
+    pass = new PasswordCoder(3);
     data = new DataBaseManager(mysqlD);
     clipBoard = QApplication::clipboard();
-    dataChange = false;
+
+    dataChange = 0;
+    lockPassword = 0;
 
     reset_list();
     set_current_data();
@@ -32,18 +29,15 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->changeDataButton, SIGNAL(released()), this, SLOT(change_data()));
     connect(ui->deleteDataButton, SIGNAL(released()), this, SLOT(delete_user()));
     connect(ui->saveButton, SIGNAL(released()), this, SLOT(add_user()));
+    connect(ui->checkRandomPassword, SIGNAL(stateChanged(int)), this, SLOT(lock_password()));
 
 }
 
 char* MainWindow::to_charPtr(QString text){
-//    QByteArray ba = text.toUtf8();
-//    char *c_str2 = ba.data();
-//    return c_str2;
       auto str = text.toStdString();
       char *cstr = new char[str.length() + 1];
       strcpy(cstr, str.c_str());
       return cstr;
-
 }
 
 void MainWindow::reset_list(){
@@ -63,34 +57,39 @@ void MainWindow::set_current_data(){
     ui->username->setText(QString::fromUtf8(present_user.username));
     ui->emailAddress->setText(QString::fromUtf8(present_user.email));
     ui->password->setText(QString::fromUtf8(present_user.password));
+
 }
 
 void MainWindow::copy_password_to_clipboard(){
-    clipBoard->setText(ui->password->text());
+    clipBoard->setText(pass->decode(ui->password->text()));
 }
 
 void MainWindow::change_data(){
+    auto currIndex = ui->sitesList->currentIndex();
     switch(dataChange){
-    case true:
+    case 1:
+        data->change_data(get_user());
+
         ui->username->setReadOnly(true);
         ui->emailAddress->setReadOnly(true);
         ui->password->setReadOnly(true);
-        dataChange = false;
+        dataChange = 0;
 
         ui->changeDataButton->setText("change Data");
 
         break;
-    case false:
+    case 0:
         ui->username->setReadOnly(false);
         ui->emailAddress->setReadOnly(false);
         ui->password->setReadOnly(false);
-        dataChange = true;
+        dataChange = 1;
+
 
         ui->changeDataButton->setText("save");
 
         break;
     }
-    std::cout<<"data_change" << std::endl;
+    ui->sitesList->setCurrentIndex(currIndex);
 }
 
 void MainWindow::delete_user(){
@@ -99,18 +98,41 @@ void MainWindow::delete_user(){
     ui->sitesList->setCurrentIndex(0);
 }
 void MainWindow::add_user(){
-    userData->site_name = to_charPtr(ui->NewSitename->text());
-    userData->email = to_charPtr(ui->NewEmailAddress->text());
-    userData->username = to_charPtr(ui->NewUsername->text());
-    userData->password = to_charPtr(ui->NewPassword->text());
-
     std::cout<< userData->site_name << std::endl;
     std::cout<< userData->email << std::endl;
     std::cout<< userData->username << std::endl;
     std::cout<< userData->password << std::endl;
 
-    data->new_data(userData);
+
+    data->new_data(get_user());
     reset_list();
+}
+
+void MainWindow::lock_password(){
+    switch(lockPassword){
+        case 0:
+            ui->NewPassword->setReadOnly(true);
+            ui->NewPassword->clear();
+            ui->NewPassword->setPlaceholderText("RANDOM");
+            lockPassword = 1;
+            break;
+        case 1:
+            ui->NewPassword->setReadOnly(false);
+            ui->NewPassword->setPlaceholderText("password");
+            lockPassword = 0;
+            break;
+    }
+}
+
+user_data *MainWindow::get_user(){
+    delete userData;
+    userData = new user_data;
+    userData->site_name = to_charPtr(ui->NewSitename->text());
+    userData->email = to_charPtr(ui->NewEmailAddress->text());
+    userData->username = to_charPtr(ui->NewUsername->text());
+    userData->password = pass->encode(ui->NewPassword->text());
+
+    return userData;
 }
 
 MainWindow::~MainWindow()
@@ -119,6 +141,7 @@ MainWindow::~MainWindow()
     delete data;
     delete mysqlD;
     delete userData;
+    delete pass;
     delete ui;
 
 }

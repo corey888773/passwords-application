@@ -30,6 +30,7 @@ public:
     void new_data(struct user_data *userData);
 //    void delete_data(char* id);
     void delete_data(const char* site_name, const char* user_name);
+    void change_data(struct user_data *userData);
     void showResult();
     void sites_to_vector();
     void show_sites();

@@ -85,13 +85,19 @@
      <item>
       <widget class="QLineEdit" name="NewSitename">
        <property name="text">
-        <string>strona</string>
+        <string/>
+       </property>
+       <property name="placeholderText">
+        <string>website</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QLineEdit" name="NewEmailAddress">
        <property name="text">
+        <string/>
+       </property>
+       <property name="placeholderText">
         <string>email</string>
        </property>
       </widget>
@@ -99,14 +105,20 @@
      <item>
       <widget class="QLineEdit" name="NewUsername">
        <property name="text">
-        <string>login</string>
+        <string/>
+       </property>
+       <property name="placeholderText">
+        <string>username</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QLineEdit" name="NewPassword">
        <property name="text">
-        <string>haslo</string>
+        <string/>
+       </property>
+       <property name="placeholderText">
+        <string>password</string>
        </property>
       </widget>
      </item>

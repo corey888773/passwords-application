@@ -23,6 +23,8 @@ set(PROJECT_SOURCES
         mainwindow.ui
         databasemanager.cpp
         databasemanager.h
+        passwordcoder.cpp
+        passwordcoder.h
         ${TS_FILES}
 )
 
