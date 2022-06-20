@@ -1,14 +1,19 @@
 #include "mainwindow.h"
+#include "databasemanager.h"
 
+#include <time.h>
 #include <QApplication>
 #include <QLocale>
 #include <QTranslator>
 
-#include "databasemanager.h"
-#include <iostream>
+
+
 
 int main(int argc, char *argv[])
 {
+
+    srand(time(NULL));
+
     QApplication a(argc, argv);
 
     QTranslator translator;
@@ -20,6 +25,9 @@ int main(int argc, char *argv[])
             break;
         }
     }
+
+
+
     MainWindow w;
 
 

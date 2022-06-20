@@ -25,7 +25,6 @@ set(PROJECT_SOURCES
         databasemanager.h
         passwordcoder.cpp
         passwordcoder.h
-        ${TS_FILES}
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

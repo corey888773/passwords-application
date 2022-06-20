@@ -19,8 +19,9 @@ MainWindow::MainWindow(QWidget *parent)
     data = new DataBaseManager(mysqlD);
     clipBoard = QApplication::clipboard();
 
-    dataChange = 0;
-    lockPassword = 0;
+
+    dataChange = locked;
+    lockPassword = unlocked;
 
     reset_list();
     set_current_data();
@@ -51,7 +52,12 @@ void MainWindow::reset_list(){
 
 void MainWindow::set_current_data(){
     if(ui->sitesList->currentText() == "")
+    {
+        ui->username->clear();
+        ui->emailAddress->clear();
+        ui->password->clear();
         return;
+    }
     auto present_user = data->gather_info(to_charPtr(ui->sitesList->currentText()));
 
     ui->username->setText(QString::fromUtf8(present_user.username));
@@ -67,23 +73,26 @@ void MainWindow::copy_password_to_clipboard(){
 void MainWindow::change_data(){
     auto currIndex = ui->sitesList->currentIndex();
     switch(dataChange){
-    case 1:
+    case unlocked:
+        userData->site_name = to_charPtr(ui->sitesList->currentText());
+        userData->username = to_charPtr(ui->username->text());
+        userData->email = to_charPtr(ui->emailAddress->text());
+        userData->password = to_charPtr(ui->password->text());
         data->change_data(userData);
 
         ui->username->setReadOnly(true);
         ui->emailAddress->setReadOnly(true);
         ui->password->setReadOnly(true);
-        dataChange = 0;
+        dataChange = locked;
 
         ui->changeDataButton->setText("change Data");
 
         break;
-    case 0:
+    case locked:
         ui->username->setReadOnly(false);
         ui->emailAddress->setReadOnly(false);
         ui->password->setReadOnly(false);
-        dataChange = 1;
-
+        dataChange = unlocked;
 
         ui->changeDataButton->setText("save");
 
@@ -98,14 +107,6 @@ void MainWindow::delete_user(){
     ui->sitesList->setCurrentIndex(0);
 }
 void MainWindow::add_user(){
-
-//    delete userData;
-//    userData = new user_data;
-//    userData->site_name = to_charPtr(ui->NewSitename->text());
-//    userData->email = to_charPtr(ui->NewEmailAddress->text());
-//    userData->username = to_charPtr(ui->NewUsername->text());
-//    userData->password = pass->encode(ui->NewPassword->text());
-
     get_user();
 
     std::cout<< userData->site_name << std::endl;
@@ -113,23 +114,23 @@ void MainWindow::add_user(){
     std::cout<< userData->username << std::endl;
     std::cout<< userData->password << std::endl;
 
-
     data->new_data(userData);
+    clear_add_user_fields();
     reset_list();
 }
 
 void MainWindow::lock_password(){
     switch(lockPassword){
-        case 0:
+        case unlocked:
             ui->NewPassword->setReadOnly(true);
             ui->NewPassword->clear();
             ui->NewPassword->setPlaceholderText("RANDOM");
-            lockPassword = 1;
+            lockPassword = locked;
             break;
-        case 1:
+        case locked:
             ui->NewPassword->setReadOnly(false);
             ui->NewPassword->setPlaceholderText("password");
-            lockPassword = 0;
+            lockPassword = unlocked;
             break;
     }
 }
@@ -140,12 +141,27 @@ void MainWindow::get_user(){
     userData->site_name = to_charPtr(ui->NewSitename->text());
     userData->email = to_charPtr(ui->NewEmailAddress->text());
     userData->username = to_charPtr(ui->NewUsername->text());
-    userData->password = pass->encode(ui->NewPassword->text());
+
+    switch(lockPassword){
+        case locked:
+            userData->password = pass->encode(pass->generate_password());
+            break;
+        case unlocked:
+            userData->password = pass->encode(ui->NewPassword->text());
+            break;
+    }
+
+}
+
+void MainWindow::clear_add_user_fields(){
+    ui->NewEmailAddress->clear();
+    ui->NewUsername->clear();
+    ui->NewSitename->clear();
+    ui->NewPassword->clear();
 }
 
 MainWindow::~MainWindow()
 {
-
     delete data;
     delete mysqlD;
     delete userData;

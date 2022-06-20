@@ -12,6 +12,7 @@ public:
     char *decode(QString txt);
     char *encode(QString txt);
     char *to_charPtr(QString text);
+    char *generate_password();
 
 };
 

@@ -9,16 +9,23 @@
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
+
+
 class MainWindow : public QMainWindow
 {
+    enum lock{
+      locked = 0,
+      unlocked = 1
+    };
+
     Q_OBJECT
     DataBaseManager *data;
     PasswordCoder *pass;
     struct connection_details *mysqlD;
     struct user_data *userData;
     QClipboard *clipBoard;
-    int dataChange;
-    int lockPassword;
+    lock dataChange;
+    lock lockPassword;
 
 public:
     MainWindow(QWidget *parent = nullptr);
@@ -29,6 +36,7 @@ private:
     char *to_charPtr(QString text);
     void reset_list();
     void get_user();
+    void clear_add_user_fields();
 
 private slots:
     void set_current_data();
